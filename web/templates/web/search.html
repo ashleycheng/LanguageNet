@@ -1,0 +1,193 @@
+{% load app_filters %}
+{% load staticfiles %}
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>LanguageNet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body style="background-color:White;">
+	<div class="ui container head-section">
+	<p></p>
+		<div style="text-align:center;">
+			<img src="{% static 'images/logo.png' %}" alt="logo" width=250 height=75/>
+			<!-- <h1 class="title">
+				LanguageNet
+			</h1> -->
+		</div><br>
+      
+	    <div class="ui centered stackable grid">
+			<form method="POST" action="">{% csrf_token %}
+				<div class="ui center large action input">
+				  <input type="text" id="search" name="search" placeholder="Search..." size=50>
+				  <button class="ui button" type="submit">Search</button>
+				</div>
+			</form>
+	    </div>
+    </div>
+
+    <div class="ui centered stackable grid">
+      <div class="eleven wide column item">
+      	<h2 class="query">{{ query }}</h2>
+      	<hr color="#737373"></hr>
+      	{% for p in pos %}
+      	<h3 class="pos">{{ p.pos }}</h3>
+	    <ol class="ui list" id = "bigFont1">
+	    {% for sens in sense2 %}  
+			{% if p.pos == sens.pos %}
+			<div class="ui vertical segment">
+	    	<li value="*" class="sense"> <h2 class="sense" > &nbsp;&nbsp;{{ sens.sense }}</h2>
+	    		{% for wd in wnexp %}
+	    			{% if sens.location == wd.location %}
+	    			<div class="wd_exp">
+	    				<p style="font-size:17px; font-style:italic; color: #778899;">&nbsp;&nbsp;&nbsp;&nbsp;{{ wd.example }}</p>
+					</div>
+					<br>
+	    			{%endif%}
+				{%endfor%}
+	    		<button class="mini ui button">
+					EN
+				</button>				
+  				<a>{{ query }}</a>;
+  				<span>
+		    	{% for sys in sysnonym %}
+			    	{% if sens.location == sys.location %}
+				    	{% if language == "en" %}
+				    		<a>{{ sys.en_wd|get_sysnonym:query }}</a>;
+				    	{% else %}
+				    		<a>{{ sys.ch_wd}}</a>;
+				    	{%endif%}
+			    	{%endif%}
+		    	{%endfor%}
+				</span>
+				<br>
+
+	    		<button class="mini ui button">
+					ZH
+  				</button>
+  				<span>
+				{% for sens2 in sense2 %}
+					{% for ali in align %}
+						{% if ali.sense_id == sens2.id and sens2.location == sens.location%}
+							{% if language == "en" %}
+								<a>{{ ali.ch_wd }}</a>;
+							{% else %}
+								<a>{{ ali.en_wd }}</a>;
+							{%endif%}						
+						{%endif%}
+					{%endfor%}
+				{%endfor%}
+				
+				</span>	
+
+			
+				<div class="ui accordion">
+					<div class="active title">
+						<i class="dropdown icon"></i>
+						Examples
+					</div>
+					<div class="active content">
+							<table class="ui celled padded table">
+						{% for sens2 in sense2 %}
+						{% for ali in align %}
+							{% if ali.sense_id == sens2.id and sens2.location == sens.location%}
+								{% if ali.inv_index != "none" %}
+									<!-- {% if language == "en" %}
+										  <li value="-" class="align">&nbsp;{{ ali.ch_wd }}</li>
+									  {% else %}
+										  <li value="-" class="align">&nbsp;{{ ali.en_wd }}</li>
+									  {%endif%} -->
+									{% for inv in ali.inv_index|split %}
+										{% for exp in example %}
+											{% if exp.exp_id == inv %}
+											<tr>
+											<td>
+													
+											<div class="en_sent">
+											{{ exp.eng_sent|highlight:ali.en_wd }} 
+											<p class="ch_sent"> {{ exp.chi_sent|highlight:ali.ch_wd }} </p>
+											</div>
+										</td>	
+									</tr>
+											<!-- <div class="ui fitted divider"></div> -->
+											{%endif%}
+										{%endfor%}
+										<!-- <br> -->
+									{%endfor%}				    
+								{%endif%}
+							{%endif%}
+						{%endfor%}
+						{%endfor%}						
+					</table>
+				</div>
+				</div>			    		
+
+				<div class="ui accordion">
+					<div class="active title">
+						<i class="dropdown icon"></i>
+						Translations in category
+					</div>
+					<div class="active content">
+						{% for gp in group %}
+							{% if gp.location == sens.location%}
+								<font size="4">
+									&nbsp;&nbsp;&nbsp;&nbsp;{{ gp.ch_words|split2 }} 
+								</font>
+							{%endif%}
+						{%endfor%}
+					</div>
+				</div>																		
+		    	<!-- {% for sens2 in sense2 %}
+		    	{% for ali in align %}
+		    		{% if ali.sense_id == sens2.id and sens2.location == sens.location%}
+		    			{% if ali.inv_index != "none" %}
+			    			{% if language == "en" %}
+					      		<li value="-" class="align">&nbsp;{{ ali.ch_wd }}</li>
+					      	{% else %}
+					      		<li value="-" class="align">&nbsp;{{ ali.en_wd }}</li>
+					      	{%endif%}
+					    	{% for inv in ali.inv_index|split %}
+					    		{% for exp in example %}
+						    		{% if exp.exp_id == inv %}
+						    		<div class="en_sent">
+						    		{{ exp.eng_sent|highlight:ali.en_wd }} 
+						    		<p class="ch_sent"> {{ exp.chi_sent|highlight:ali.ch_wd }} </p>
+						    		</div>
+						    		{%endif%}
+					    		{%endfor%}
+					    		<br>
+					    	{%endfor%}
+					    {% else %}
+			    			{% if language == "en" %}
+					      		<li value="-" class="align">&nbsp;{{ ali.ch_wd }}</li>
+					      	{% else %}
+					      		<li value="-" class="align">&nbsp;{{ ali.en_wd }}</li>
+					      	{%endif%}					    
+				    	{%endif%}
+				    {%endif%}
+				{%endfor%}
+				{%endfor%} -->
+				<!-- </ol> -->
+			</li>
+		</div>
+			 {%endif%}
+	    {%endfor%}
+		</ol>
+		<div class="ui section divider"></div>
+		{%endfor%}
+      </div>
+	</div>
+	
+	{% block javascript %}
+	<script>
+		$('.ui.accordion')
+		.accordion('close',0)
+		;	  
+	</script>
+  {% endblock %}
+</body>
+</html>

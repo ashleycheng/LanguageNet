@@ -1,0 +1,54 @@
+/*.bigFont li{
+font-size: 18px;
+}
+
+.bigFont p{
+font-size: 15px;
+}
+
+#bigFont1{
+font-size: 20px;
+}*/
+
+.sense{
+font-size: 22px;
+}
+
+.align{
+font-size: 19px;
+}
+
+.query{
+font-size: 35px;
+}
+
+.pos{
+font-size: 25px;
+color: #b34700;
+}
+
+#hr{
+color: #1aa3ff;	
+}
+
+.title{
+font-size: 30px;
+font-family: Avantgarde, TeX Gyre Adventor, URW Gothic L, sans-serif;
+}
+
+.wd_exp{
+font-size: 17px;
+font-style:italic;
+color: #444444;
+}
+
+.en_sent{
+font-size: 17px;
+}
+.ch_sent{
+font-size: 15px;
+}
+
+.highlight{
+color: #cc2900;
+}
